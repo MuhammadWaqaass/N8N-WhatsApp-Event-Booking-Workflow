@@ -3,37 +3,7 @@
 An **AI-powered WhatsApp Search & Appointment Booking Bot** built using **n8n**, supporting **both voice and text conversations**.
 The system automatically understands user intent, searches availability, and books appointments in real time.
 
-User (WhatsApp: Text / Voice)
-        |
-        v
-WhatsApp Cloud API
-        |
-        v
-n8n Workflow (Single Trigger - Meta Compliant)
-        |
-        |--> Voice Message?
-        |        |
-        |        v
-        |   ElevenLabs Speech-to-Text
-        |
-        v
-AI Intent Classifier (LangChain + Groq)
-        |
-        |--> Search Request
-        |        |
-        |        v
-        |   Google Sheets (Doctor / Event Database)
-        |
-        |--> Booking Request
-        |        |
-        |        v
-        |   Google Calendar (Create Appointment)
-        |
-        v
-AI Response Generator (Groq LLM)
-        |
-        v
-WhatsApp Reply (Text or Voice)
+<img width="623" height="302" alt="booking" src="https://github.com/user-attachments/assets/80d7f564-b17f-45b0-9075-7533016bbf37" />
 
 ## 🚀 Overview
 
