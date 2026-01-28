@@ -1,0 +1,621 @@
+{
+  "name": "Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "all"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        144
+      ],
+      "id": "2884c1d6-e62c-4909-a03c-ca41e3e5eca5",
+      "name": "WhatsApp Trigger",
+      "webhookId": "2fe6cebf-c52e-4fae-ae87-1449e26c66f8",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "x1okj9EcPKKBCQko",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "959475930578730",
+        "recipientPhoneNumber": "+923157891740",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        -256
+      ],
+      "id": "db084145-021e-4dd7-b800-df36fc60c953",
+      "name": "Send message",
+      "webhookId": "ed58cd58-ca87-44ed-ba85-5204d0ba8959",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Nt3eZS3kdjIeXm1v",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "operation": "speechToText",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        288
+      ],
+      "id": "c406763c-04f7-44ef-8121-3435b2e7f59b",
+      "name": "Transcribe audio or video",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "kZaiDkgNNHZD4mmt",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        288
+      ],
+      "id": "ea00b979-65eb-4181-a66b-ccdd3e51778d",
+      "name": "Download media",
+      "webhookId": "3def0961-c485-4c2f-8a89-f6eeba478bef",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Nt3eZS3kdjIeXm1v",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -432,
+        288
+      ],
+      "id": "3ecfc658-3736-4ab7-8186-2234c463b0f4",
+      "name": "HTTP Request",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Nt3eZS3kdjIeXm1v",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "061989aa-656c-4d99-b023-d1661702116a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e34747c3-72db-4a67-82e4-2c5d9a98f005",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        144
+      ],
+      "id": "5999a232-383c-4b3f-8669-c83d90c5912f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c68a770-9532-456d-b988-3bae9febc725",
+              "name": "text",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        128
+      ],
+      "id": "f849dfad-5452-4376-93c7-81debab68e44",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "search doctor"
+            },
+            {
+              "category": "book appointment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        128
+      ],
+      "id": "adf319f4-6c86-46bc-b9bd-b3c415a4afa4",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        16
+      ],
+      "id": "dd081303-69e4-461b-ad4c-345094ac6382",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "ePfAr6apfIW1gAhG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "\nYou are an assistant that books doctor appointments and creates events in Google Calendar.\n\nBehavior rules:\n- Extract patient name, doctor name, booking date, and booking time directly from the user message if they are present.\n- Do NOT ask again for information that is already provided.\n- If one or more required fields are missing, ask ONLY for the missing fields.\n- Once all required details are available, create the Google Calendar event using the tool.\n- After creating the event, generate and return a unique random reference number.\n- Keep responses short and clear.\nCurrent time {{$now}}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        96,
+        240
+      ],
+      "id": "f4fca7b7-eb54-4214-9bcc-e522bc325aa2",
+      "name": "Event agent"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "dbc5a2344fc1a233d77eb4f27d33a2cfc32bf1eee3c840291f927ddeef03a60a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        352
+      ],
+      "id": "43feb858-ec7d-45fc-86a3-60e3f16b429f",
+      "name": "Create event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "UUX1WK5yQ1Q4RgJc",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        368,
+        352
+      ],
+      "id": "663734d4-10c1-43fb-ba24-ffce9fad5893",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "ePfAr6apfIW1gAhG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VZTlT39ueqrOxPVjxb8GFBmlHGiHRceczcfWBHZ338U",
+          "mode": "list",
+          "cachedResultName": "dr-database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VZTlT39ueqrOxPVjxb8GFBmlHGiHRceczcfWBHZ338U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VZTlT39ueqrOxPVjxb8GFBmlHGiHRceczcfWBHZ338U/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        80
+      ],
+      "id": "9e6cb05c-331b-48bb-b523-814c4fa1caa3",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B69J4MK2szW55ulO",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an assistant that helps users find a suitable doctor using the provided Google Sheet data as a tool.\n\nRules:\n- Interpret the user’s intent and map it to relevant doctor specializations.\n- Use ONLY the information available in the Google Sheet.\n- If a suitable doctor exists, list the doctor name, specialization, available day, and time.\n- If no relevant doctor is found, reply: \"I don’t have that information.\"\n- Do NOT invent doctors or schedules not present in the sheet.\n- Keep answers concise and factual.\n\nGoogle Sheet Data is available via tool.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        96,
+        -32
+      ],
+      "id": "0aa65a82-e6d4-4f02-91a7-42f8f4dcc68c",
+      "name": "Search Dr agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        368,
+        80
+      ],
+      "id": "d4b6c5b6-c45d-4c0d-a6ef-b85db015e3bd",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "ePfAr6apfIW1gAhG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "222"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        352
+      ],
+      "id": "c522a20d-89bf-4b11-a35c-3bbc66f7dddd",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "111"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        80
+      ],
+      "id": "90048f75-a06c-4007-ba62-552cdeedeefa",
+      "name": "Simple Memory2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe audio or video": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe audio or video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Search Dr agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Event agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Event agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "Search Dr agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Search Dr agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Event agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Search Dr agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Dr agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "9831a50f-788f-436c-a306-4e33f9e17315",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7c0fb59a1a80e73fdf930435bf7da596c15a51ca2714a975b4817596fe5cb4e5"
+  },
+  "id": "vnb790Etq61W8YNvwEusv",
+  "tags": []
+}
